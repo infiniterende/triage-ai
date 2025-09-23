@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { Room, createLocalAudioTrack, RemoteParticipant } from "livekit-client";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import "@livekit/components-styles";
 import VoiceMode from "./VoiceMode";
@@ -9,34 +10,32 @@ type LiveKitModalProps = {
   setShowSupport: Dispatch<SetStateAction<boolean>>;
 };
 
+const ENDPOINT = "https://agilance-backend.onrender.com";
+
 const LiveKitModal = ({ setShowSupport }: LiveKitModalProps) => {
+  const [room, setRoom] = useState<Room | null>(null);
   const [isSubmittingName, setIsSubmittingName] = useState<boolean>(true);
   const [name, setName] = useState<string>("");
   const [token, setToken] = useState<string>("");
-
+  console.log(token);
   console.log(process.env.NEXT_PUBLIC_API_URL);
   const getToken = useCallback(async (userName: string) => {
     try {
       console.log("run");
-      const response = await fetch(
-        `http://localhost:8000/getToken?name=${encodeURIComponent(userName)}`
-      );
+      const response = await fetch(`${ENDPOINT}/getToken?name=${userName}`);
+      console.log("t", response);
       const data = await response.json();
-      const token = data.token;
+      const token = await data.token;
       setToken(token);
       setIsSubmittingName(false);
     } catch (error) {
       console.error(error);
     }
   }, []);
-
-  const handleNameSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleNameSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (name.trim()) {
-      getToken(name);
-    }
+    if (!name.trim()) getToken(name);
   };
-
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -67,15 +66,15 @@ const LiveKitModal = ({ setShowSupport }: LiveKitModalProps) => {
               serverUrl={process.env.NEXT_PUBLIC_API_URL}
               token={token}
               connect={true}
-              video={false}
               audio={true}
+              video={false}
               onDisconnected={() => {
                 setShowSupport(false);
                 setIsSubmittingName(true);
               }}
             >
               <RoomAudioRenderer />
-              <VoiceMode name={name} />
+              <VoiceMode />
             </LiveKitRoom>
           ) : null}
         </div>

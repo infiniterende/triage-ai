@@ -7,45 +7,72 @@ import prisma from "@/prisma/client";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
+  },
   providers: [
     CredentialsProvider({
-      name: "Credentials",
+      name: "credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        action: { label: "Action", type: "text" },
+        // Signup fields
+        firstName: { label: "First Name", type: "text" },
+        lastName: { label: "Last Name", type: "text" },
+        medicalLicense: { label: "Medical License", type: "text" },
+        specialization: { label: "Specialization", type: "text" },
+        phoneNumber: { label: "Phone Number", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
-        const user = await prisma.doctor.findUnique({
-          where: { email: credentials.email },
-        });
-        if (
-          !user ||
-          !(await bcrypt.compare(credentials.password, user.password))
-        ) {
-          return null;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
         }
-        return { id: user.id.toString(), name: user.name, email: user.email };
+
+        try {
+          const response = await fetch(
+            `${process.env.BACKEND_URL}/auth/verify-credentials`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(credentials),
+            }
+          );
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || "Authentication failed");
+          }
+
+          const doctor = await response.json();
+          return doctor;
+        } catch (error) {
+          throw new Error(
+            error instanceof Error ? error.message : "Authentication failed"
+          );
+        }
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+      }
       return token;
     },
     async session({ session, token }) {
-      if (token?.id) (session.user as { id: string }).id = token.id as string;
+      if (token) {
+      }
       return session;
     },
   },
   pages: {
-    signIn: "/login",
+    signIn: "/auth/signin",
     error: "/auth/error",
   },
-  session: {
-    strategy: "jwt",
-  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
