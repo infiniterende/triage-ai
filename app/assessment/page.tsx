@@ -73,16 +73,20 @@ const AssessmentPage = () => {
     scrollToBottom();
   }, [messages]);
 
+  console.log(showVoiceSupport);
   const startChat = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${ENDPOINT}/api/chat/start`, {
-        mode: "no-cors",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/chat/start`,
+        {
+          mode: "no-cors",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         const data: ChatResponse = await response.json();
@@ -99,9 +103,6 @@ const AssessmentPage = () => {
     }
   };
 
-  const ENDPOINT = "https://agilance-backend.onrender.com";
-  const API = "https://api.agilance.org";
-
   const sendMessage = async () => {
     if (!inputMessage?.trim() || isLoading || !sessionId) return;
 
@@ -110,16 +111,19 @@ const AssessmentPage = () => {
     setInputMessage("");
 
     try {
-      const response = await fetch(`${ENDPOINT}/api/chat/message`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          session_id: sessionId,
-          message: userMessage,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/chat/message`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            message: userMessage,
+          }),
+        }
+      );
 
       if (response.ok) {
         const data: ChatResponse = await response.json();
@@ -233,9 +237,11 @@ const AssessmentPage = () => {
               </button>
             </div>
           </div>
+
           {showVoiceSupport && (
             <LiveKitModal setShowSupport={setShowVoiceSupport} />
           )}
+
           {mode === "text" && <AssessmentChat />}
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-gray-500">

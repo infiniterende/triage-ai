@@ -158,6 +158,8 @@ const AssessmentChat = () => {
 
     return "🩺";
   };
+
+  console.log("f", showVoiceSupport);
   return (
     <div>
       {showVoiceSupport && (
