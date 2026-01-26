@@ -20,11 +20,13 @@ const LiveKitModal = ({ setShowSupport }: LiveKitModalProps) => {
   const getToken = useCallback(async (userName: string) => {
     try {
       console.log("run");
+      const API_BASE_URL = "http://localhost:8000";
+      const ENDPOINT = "https://agilance-api.onrender.com";
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/getToken?name=${userName}`
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/getToken?name=${userName}`,
       );
       // const response = await fetch(
-      //   `http://localhost:8000/getToken?name=${userName}`
+      //   `http://localhost:8000/getToken?name=${userName}`,
       // );
       console.log("t", response);
       const data = await response.json();

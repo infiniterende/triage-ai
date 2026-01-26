@@ -34,7 +34,7 @@ export default function Home() {
   useEffect(() => {
     // Generate unique session ID
     setSessionId(
-      `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     );
   }, []);
 
@@ -51,7 +51,7 @@ export default function Home() {
     setCurrentScreen("assessment");
     setAssessmentResult(null);
     setSessionId(
-      `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     );
   };
 
@@ -72,19 +72,23 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
-  const ENDPOINT = "https://agilance-backend.onrender.com";
+  const API_BASE_URL = "http://localhost:8000";
+  const ENDPOINT = "https://agilance-api.onrender.com";
   const API = "https://api.agilance.org";
 
   const startChat = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${ENDPOINT}/api/chat/start`, {
-        mode: "no-cors",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/chat/start`,
+        {
+          mode: "no-cors",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const data: ChatResponse = await response.json();
@@ -109,16 +113,19 @@ export default function Home() {
     setInputMessage("");
 
     try {
-      const response = await fetch(`${ENDPOINT}/api/chat/message`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/chat/message`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            message: userMessage,
+          }),
         },
-        body: JSON.stringify({
-          session_id: sessionId,
-          message: userMessage,
-        }),
-      });
+      );
 
       if (response.ok) {
         const data: ChatResponse = await response.json();

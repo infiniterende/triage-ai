@@ -33,14 +33,17 @@ const Home = () => {
     signOut({ callbackUrl: "/" });
   };
 
-  const API = "https://agilance-backend.onrender.com";
+  const API_BASE_URL = "http://localhost:8000";
+  const ENDPOINT = "https://agilance-api.onrender.com";
 
   const [patients, setPatients] = useState<Patient[]>([]);
 
   console.log(patients);
   useEffect(() => {
     const fetchPatients = async () => {
-      const response = await fetch(`${API}/api/patients`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/api/patients`,
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -307,8 +310,8 @@ const Home = () => {
                                 patient.probability >= 0.8
                                   ? "bg-red-500"
                                   : patient.probability >= 0.5
-                                  ? "bg-yellow-500"
-                                  : "bg-green-500"
+                                    ? "bg-yellow-500"
+                                    : "bg-green-500"
                               }`}
                             ></div>
                             {(patient.probability * 100).toFixed(0)}%
@@ -363,7 +366,7 @@ const Home = () => {
                       >
                         {day}
                       </div>
-                    )
+                    ),
                   )}
                 </div>
                 <div className="grid grid-cols-7 gap-4">
@@ -380,8 +383,8 @@ const Home = () => {
                           isToday
                             ? "bg-blue-50 border-blue-200"
                             : isTomorrow
-                            ? "bg-gray-50 border-gray-200"
-                            : "bg-white border-gray-100"
+                              ? "bg-gray-50 border-gray-200"
+                              : "bg-white border-gray-100"
                         }`}
                       >
                         <div
