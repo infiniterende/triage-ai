@@ -1,0 +1,41 @@
+# Render Blueprint for the Agilance web app (Next.js).
+# Dashboard → New → Blueprint → select the agilance-frontend repo.
+#
+# NEXT_PUBLIC_* values are inlined at build time, so changing them requires
+# a redeploy ("Manual Deploy → Clear build cache & deploy").
+
+services:
+  - type: web
+    name: agilance-web
+    runtime: node
+    plan: starter
+    region: ohio
+    buildCommand: npm ci --no-audit --no-fund && npx prisma generate && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      # Public (shipped to the browser) — the API service from backend/render.yaml
+      - key: NEXT_PUBLIC_API_ENDPOINT
+        value: https://agilance-api.onrender.com
+      - key: NEXT_PUBLIC_LIVEKIT_URL
+        sync: false
+      # Server-side only
+      - key: NEXTAUTH_URL
+        value: https://agilance-web.onrender.com
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false

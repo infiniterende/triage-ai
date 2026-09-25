@@ -1,141 +1,173 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import AuthLayout from "../components/auth/AuthLayout";
 
-type SignupProps = {
-  name: string;
-  email: string;
-  password: string;
-  specialty?: string;
-};
+const SPECIALTIES = [
+  { value: "cardiology", label: "Cardiology" },
+  { value: "general", label: "General medicine" },
+  { value: "emergency", label: "Emergency medicine" },
+  { value: "neurology", label: "Neurology" },
+  { value: "pediatrics", label: "Pediatrics" },
+  { value: "orthopedics", label: "Orthopedics" },
+];
 
 export default function SignupPage() {
-  const [signupData, setSignupData] = useState<SignupProps>({
+  const router = useRouter();
+  const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     specialty: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const router = useRouter();
+  const update = (key: keyof typeof form) => (value: string) =>
+    setForm((f) => ({ ...f, [key]: value }));
 
-  async function handleSignup(e: React.FormEvent) {
+  async function handleSignup(e: FormEvent) {
     e.preventDefault();
-
-    if (!signupData.specialty) {
-      alert("Please select a specialty.");
+    setError(null);
+    if (!form.specialty) {
+      setError("Please select your specialty.");
       return;
     }
-
-    const res = await fetch("/api/register", {
-      method: "POST",
-      body: JSON.stringify({
-        name: signupData.name,
-        email: signupData.email,
-        password: signupData.password,
-        specialty: signupData.specialty,
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (res.ok) router.push("/login");
-    else alert("Registration failed");
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        router.push("/login");
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      setError(
+        res.status === 409
+          ? "An account with that email already exists."
+          : data?.message || "Registration failed. Please try again.",
+      );
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Create Account
-          </h1>
-          <p className="text-gray-600">Join our medical platform</p>
+    <AuthLayout
+      title="Create your account"
+      description="Join Agilance to see your patients' assessments in one calm, prioritised view."
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link href="/login" className="font-semibold text-brand-600 hover:text-brand-700">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSignup} className="space-y-5" noValidate>
+        <div>
+          <label htmlFor="name" className="field-label">
+            Full name
+          </label>
+          <input
+            id="name"
+            type="text"
+            autoComplete="name"
+            required
+            value={form.name}
+            onChange={(e) => update("name")(e.target.value)}
+            placeholder="Dr. Jane Smith"
+            className="field-input"
+          />
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={signupData.name}
-              onChange={(e) =>
-                setSignupData({ ...signupData, name: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Dr. John Smith"
-            />
-          </div>
+        <div>
+          <label htmlFor="email" className="field-label">
+            Work email
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            required
+            value={form.email}
+            onChange={(e) => update("email")(e.target.value)}
+            placeholder="you@clinic.org"
+            className="field-input"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={signupData.email}
-              onChange={(e) =>
-                setSignupData({ ...signupData, email: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="doctor@hospital.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Specialty
-            </label>
-            <select
-              value={signupData.specialty}
-              onChange={(e) =>
-                setSignupData({ ...signupData, specialty: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select Specialty</option>
-              <option value="cardiology">Cardiology</option>
-              <option value="neurology">Neurology</option>
-              <option value="orthopedics">Orthopedics</option>
-              <option value="pediatrics">Pediatrics</option>
-              <option value="general">General Medicine</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              value={signupData.password}
-              onChange={(e) =>
-                setSignupData({ ...signupData, password: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button
-            onClick={handleSignup}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200"
+        <div>
+          <label htmlFor="specialty" className="field-label">
+            Specialty
+          </label>
+          <select
+            id="specialty"
+            required
+            value={form.specialty}
+            onChange={(e) => update("specialty")(e.target.value)}
+            className="field-input appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%2364748b%22 stroke-width=%222%22><path stroke-linecap=%22round%22 stroke-linejoin=%22round%22 d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:16px_16px] bg-[right_0.9rem_center] bg-no-repeat pr-10"
           >
-            Create Account
-          </button>
+            <option value="">Select a specialty</option>
+            {SPECIALTIES.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{" "}
-            <button className="text-blue-600 hover:text-blue-800 font-medium">
-              Sign in
-            </button>
-          </p>
+        <div>
+          <label htmlFor="password" className="field-label">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+            value={form.password}
+            onChange={(e) => update("password")(e.target.value)}
+            placeholder="At least 8 characters"
+            className="field-input"
+          />
         </div>
-      </div>
-    </div>
+
+        {error && (
+          <p role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700 ring-1 ring-rose-100">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="btn-primary w-full py-3 text-[15px]"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Creating account…
+            </>
+          ) : (
+            "Create account"
+          )}
+        </button>
+
+        <p className="text-center text-xs leading-5 text-slate-500">
+          By creating an account you agree to keep patient data confidential in
+          line with your organisation&apos;s policies.
+        </p>
+      </form>
+    </AuthLayout>
   );
 }

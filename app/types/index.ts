@@ -75,10 +75,6 @@ export interface TranscriptionResponse {
   transcription: string;
 }
 
-export interface ChatResponse {
-  response: string;
-}
-
 export interface SpeechResponse {
   audio_url: string;
 }
@@ -206,4 +202,23 @@ export interface AssessmentQuestion {
 
 export interface AssessmentResponse {
   [key: string]: string;
+}
+
+/** A triaged patient as returned by `GET /api/patients` on the backend. */
+export interface PatientRecord {
+  id: string;
+  name: string;
+  gender: string;
+  age: number;
+  phone_number: string;
+  pain_quality: string;
+  location: string;
+  stress: string;
+  sob: string;
+  hypertension: string;
+  diabetes: string;
+  hyperlipidemia: string;
+  smoking: string;
+  /** Model probability of a cardiac cause. May be 0–1 or 0–100. */
+  probability: number;
 }
