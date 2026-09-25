@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   Activity,
@@ -43,7 +44,11 @@ function Bubble({
   const isUser = role === "user";
   return (
     <div
-      className={cn("flex items-end gap-2", isUser && "flex-row-reverse", className)}
+      className={cn(
+        "flex items-end gap-2",
+        isUser && "flex-row-reverse",
+        className,
+      )}
     >
       {!isUser && (
         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white ring-1 ring-slate-200">
@@ -64,9 +69,17 @@ function Bubble({
   );
 }
 
-function WaveBars({ bars = 9, className }: { bars?: number; className?: string }) {
+function WaveBars({
+  bars = 9,
+  className,
+}: {
+  bars?: number;
+  className?: string;
+}) {
   return (
-    <div className={cn("flex h-10 items-center justify-center gap-1.5", className)}>
+    <div
+      className={cn("flex h-10 items-center justify-center gap-1.5", className)}
+    >
       {Array.from({ length: bars }).map((_, i) => (
         <span
           key={i}
@@ -144,7 +157,10 @@ export default function HomePage() {
                   attention first.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <Link href="/assessment" className="btn-primary px-6 py-3 text-[15px]">
+                  <Link
+                    href="/assessment"
+                    className="btn-primary px-6 py-3 text-[15px]"
+                  >
                     Start assessment
                     <span className="btn-icon-pill">
                       <ArrowRight className="h-3.5 w-3.5" />
@@ -159,14 +175,16 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500">
-                  {["No account needed", "About 3 minutes", "Private by design"].map(
-                    (t) => (
-                      <li key={t} className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-brand-600" />
-                        {t}
-                      </li>
-                    ),
-                  )}
+                  {[
+                    "No account needed",
+                    "About 3 minutes",
+                    "Private by design",
+                  ].map((t) => (
+                    <li key={t} className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-brand-600" />
+                      {t}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -240,7 +258,10 @@ export default function HomePage() {
         {/* ------------------------------------------------------------ */}
         {/* Features                                                      */}
         {/* ------------------------------------------------------------ */}
-        <section id="features" className="container-x scroll-mt-24 py-20 sm:py-24">
+        <section
+          id="features"
+          className="container-x scroll-mt-24 py-20 sm:py-24"
+        >
           <SectionHeading
             eyebrow="Features"
             title={
@@ -273,7 +294,9 @@ export default function HomePage() {
                     How would you describe the pain — sharp, pressure-like,
                     burning, or a dull ache?
                   </Bubble>
-                  <Bubble role="user">Pressure-like, mostly in the centre.</Bubble>
+                  <Bubble role="user">
+                    Pressure-like, mostly in the centre.
+                  </Bubble>
                   <Bubble role="assistant">
                     Does it get worse with activity, like stairs or walking
                     uphill?
@@ -405,7 +428,10 @@ export default function HomePage() {
         {/* ------------------------------------------------------------ */}
         {/* How it works                                                  */}
         {/* ------------------------------------------------------------ */}
-        <section id="how-it-works" className="scroll-mt-24 bg-[#F6F8FC] py-20 sm:py-24">
+        <section
+          id="how-it-works"
+          className="scroll-mt-24 bg-[#F6F8FC] py-20 sm:py-24"
+        >
           <div className="container-x">
             <SectionHeading
               eyebrow="How it works"
@@ -507,7 +533,10 @@ export default function HomePage() {
         {/* ------------------------------------------------------------ */}
         {/* For clinicians                                                */}
         {/* ------------------------------------------------------------ */}
-        <section id="clinicians" className="scroll-mt-24 bg-[#F6F8FC] py-20 sm:py-24">
+        <section
+          id="clinicians"
+          className="scroll-mt-24 bg-[#F6F8FC] py-20 sm:py-24"
+        >
           <div className="container-x grid items-center gap-12 lg:grid-cols-2">
             <div>
               <SectionHeading
@@ -523,7 +552,10 @@ export default function HomePage() {
                   "One-click review of the full assessment transcript",
                   "Works alongside your existing scheduling",
                 ].map((b) => (
-                  <li key={b} className="flex items-start gap-3 text-sm text-slate-700">
+                  <li
+                    key={b}
+                    className="flex items-start gap-3 text-sm text-slate-700"
+                  >
                     <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-600 text-white">
                       <Check className="h-3 w-3" />
                     </span>
@@ -549,7 +581,9 @@ export default function HomePage() {
               <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <div className="flex items-center gap-2">
                   <LogoMark className="h-6 w-6" />
-                  <span className="text-sm font-semibold">Clinician overview</span>
+                  <span className="text-sm font-semibold">
+                    Clinician overview
+                  </span>
                 </div>
                 <span className="chip bg-emerald-50 text-emerald-700 ring-emerald-600/15">
                   Live
@@ -562,7 +596,9 @@ export default function HomePage() {
                   { l: "Avg. risk", v: "31%" },
                 ].map((s) => (
                   <div key={s.l} className="rounded-2xl bg-slate-50 p-3.5">
-                    <p className="text-[11px] font-medium text-slate-500">{s.l}</p>
+                    <p className="text-[11px] font-medium text-slate-500">
+                      {s.l}
+                    </p>
                     <p
                       className={cn(
                         "mt-1 font-display text-xl font-semibold tabular-nums",
@@ -583,17 +619,47 @@ export default function HomePage() {
                     <span className="text-right">Risk</span>
                   </div>
                   {[
-                    { n: "M. Alvarez", a: "58 · M", p: "Pressure", f: "HTN, DM", l: "high" as const, s: 86 },
-                    { n: "J. Chen", a: "47 · F", p: "Squeezing", f: "Smoking", l: "moderate" as const, s: 61 },
-                    { n: "R. Okafor", a: "39 · M", p: "Sharp", f: "—", l: "low" as const, s: 18 },
-                    { n: "L. Novak", a: "64 · F", p: "Burning", f: "HLD", l: "moderate" as const, s: 54 },
+                    {
+                      n: "M. Alvarez",
+                      a: "58 · M",
+                      p: "Pressure",
+                      f: "HTN, DM",
+                      l: "high" as const,
+                      s: 86,
+                    },
+                    {
+                      n: "J. Chen",
+                      a: "47 · F",
+                      p: "Squeezing",
+                      f: "Smoking",
+                      l: "moderate" as const,
+                      s: 61,
+                    },
+                    {
+                      n: "R. Okafor",
+                      a: "39 · M",
+                      p: "Sharp",
+                      f: "—",
+                      l: "low" as const,
+                      s: 18,
+                    },
+                    {
+                      n: "L. Novak",
+                      a: "64 · F",
+                      p: "Burning",
+                      f: "HLD",
+                      l: "moderate" as const,
+                      s: 54,
+                    },
                   ].map((r) => (
                     <div
                       key={r.n}
                       className="grid grid-cols-[1.4fr_1fr_1fr_0.9fr] items-center border-t border-slate-100 px-4 py-2.5 text-[13px]"
                     >
                       <span>
-                        <span className="font-medium text-slate-800">{r.n}</span>
+                        <span className="font-medium text-slate-800">
+                          {r.n}
+                        </span>
                         <span className="ml-1.5 text-slate-400">{r.a}</span>
                       </span>
                       <span className="text-slate-600">{r.p}</span>
@@ -612,7 +678,10 @@ export default function HomePage() {
         {/* ------------------------------------------------------------ */}
         {/* Emergency note + CTA                                          */}
         {/* ------------------------------------------------------------ */}
-        <section id="emergency" className="container-x scroll-mt-24 py-20 sm:py-24">
+        <section
+          id="emergency"
+          className="container-x scroll-mt-24 py-20 sm:py-24"
+        >
           <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-rose-100 bg-rose-50/60 p-6 sm:flex-row sm:items-center">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white text-rose-600 ring-1 ring-rose-100">
               <Phone className="h-5 w-5" />
@@ -627,7 +696,10 @@ export default function HomePage() {
                 for an assessment to finish.
               </p>
             </div>
-            <a href="tel:911" className="btn-dark shrink-0 bg-rose-600 hover:bg-rose-700">
+            <a
+              href="tel:911"
+              className="btn-dark shrink-0 bg-rose-600 hover:bg-rose-700"
+            >
               <Phone className="h-4 w-4" />
               Call 911
             </a>
