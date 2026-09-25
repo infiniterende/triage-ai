@@ -1,10 +1,8 @@
 // /lib/auth.ts
 
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import prisma from "@/prisma/client";
-import bcrypt from "bcryptjs";
+import { BACKEND_URL } from "@/lib/backend";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -32,13 +30,13 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const response = await fetch(
-            `${process.env.BACKEND_URL}/auth/verify-credentials`,
+            `${BACKEND_URL}/auth/verify-credentials`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(credentials),
+              body: JSON.stringify({ email: credentials.email, password: credentials.password }),
             }
           );
 
@@ -71,8 +69,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    signIn: "/login",
+    error: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
