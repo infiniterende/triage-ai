@@ -23,7 +23,7 @@ services:
         value: "1"
       # Public (shipped to the browser) — the API service from backend/render.yaml
       - key: NEXT_PUBLIC_API_ENDPOINT
-        value: https://agilance-api.onrender.com
+        value: https://triage-ai-backend-ei74.onrender.com
       - key: NEXT_PUBLIC_LIVEKIT_URL
         sync: false
       # Server-side only
