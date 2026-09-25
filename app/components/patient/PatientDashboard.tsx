@@ -24,9 +24,17 @@ import { FlagChip, RiskBadge, riskLevelFromPercent } from "../shared/RiskBadge";
 import Modal, { DemoNotice } from "../shared/Modal";
 import { ChatMessage } from "../assessment/ChatMessage";
 import TextAssessment from "../assessment/TextAssessment";
-import PathwayResultCard, { DispositionPill } from "../pathway/PathwayResultCard";
+import PathwayResultCard, {
+  DispositionPill,
+} from "../pathway/PathwayResultCard";
 import ScheduleAppointmentDialog from "./ScheduleAppointmentDialog";
-import { api, recallPatientId, type Appointment, type ChatTranscript, type PatientSummary } from "@/lib/api";
+import {
+  api,
+  recallPatientId,
+  type Appointment,
+  type ChatTranscript,
+  type PatientSummary,
+} from "@/lib/api";
 import { SAMPLE_PATIENT_SUMMARY, SAMPLE_TRANSCRIPT } from "@/lib/sampleData";
 import {
   describeChestPain,
@@ -36,17 +44,39 @@ import {
   type DispositionLevel,
   type PathwayResult,
 } from "@/lib/pathway";
-import { formatDate, formatDateTime, initialsOf, relativeTime } from "@/lib/format";
+import {
+  formatDate,
+  formatDateTime,
+  initialsOf,
+  relativeTime,
+} from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export type PatientTab = "overview" | "conversations" | "appointments" | "history" | "notes";
+export type PatientTab =
+  | "overview"
+  | "conversations"
+  | "appointments"
+  | "history"
+  | "notes";
 
 const TAB_META: Record<PatientTab, { title: string; subtitle: string }> = {
   overview: { title: "Overview", subtitle: "Your heart health at a glance" },
-  conversations: { title: "Conversations", subtitle: "Every assessment you've had with the Agilance assistant" },
-  appointments: { title: "Visits & appointments", subtitle: "Upcoming and past visits with your care team" },
-  history: { title: "History & symptoms", subtitle: "What the assistant has learned about you" },
-  notes: { title: "Doctor's notes", subtitle: "Messages and plans from your clinicians" },
+  conversations: {
+    title: "Conversations",
+    subtitle: "Every assessment you've had with the Agilance assistant",
+  },
+  appointments: {
+    title: "Visits & appointments",
+    subtitle: "Upcoming and past visits with your care team",
+  },
+  history: {
+    title: "History & symptoms",
+    subtitle: "What the assistant has learned about you",
+  },
+  notes: {
+    title: "Doctor's notes",
+    subtitle: "Messages and plans from your clinicians",
+  },
 };
 
 function greeting(): string {
@@ -78,9 +108,15 @@ export default function PatientDashboard({
   const [loading, setLoading] = useState(true);
   const [scheduleOpen, setScheduleOpen] = useState(openScheduler);
   const [assistantOpen, setAssistantOpen] = useState(false);
-  const [transcript, setTranscript] = useState<{ title: string; data: ChatTranscript } | null>(null);
+  const [transcript, setTranscript] = useState<{
+    title: string;
+    data: ChatTranscript;
+  } | null>(null);
 
-  const patientId = useMemo(() => patientIdFromUrl ?? recallPatientId(), [patientIdFromUrl]);
+  const patientId = useMemo(
+    () => patientIdFromUrl ?? recallPatientId(),
+    [patientIdFromUrl],
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -114,16 +150,42 @@ export default function PatientDashboard({
   const patient = summary?.patient;
   const latest = summary?.latest_evaluation?.result ?? null;
   const upcoming = (summary?.appointments ?? [])
-    .filter((a) => a.status !== "cancelled" && a.status !== "completed" && new Date(a.scheduled_for) >= new Date(Date.now() - 3600_000))
+    .filter(
+      (a) =>
+        a.status !== "cancelled" &&
+        a.status !== "completed" &&
+        new Date(a.scheduled_for) >= new Date(Date.now() - 3600_000),
+    )
     .sort((a, b) => a.scheduled_for.localeCompare(b.scheduled_for));
-  const past = (summary?.appointments ?? []).filter((a) => !upcoming.includes(a));
+  const past = (summary?.appointments ?? []).filter(
+    (a) => !upcoming.includes(a),
+  );
 
   const nav: NavItem[] = [
     { label: "Overview", href: "/patient?tab=overview", icon: Home },
-    { label: "Conversations", href: "/patient?tab=conversations", icon: MessageSquare, badge: summary?.conversations.length },
-    { label: "Visits & appointments", href: "/patient?tab=appointments", icon: CalendarDays, badge: upcoming.length || undefined },
-    { label: "History & symptoms", href: "/patient?tab=history", icon: ClipboardList },
-    { label: "Doctor's notes", href: "/patient?tab=notes", icon: FileText, badge: summary?.notes.length || undefined },
+    {
+      label: "Conversations",
+      href: "/patient?tab=conversations",
+      icon: MessageSquare,
+      badge: summary?.conversations.length,
+    },
+    {
+      label: "Visits & appointments",
+      href: "/patient?tab=appointments",
+      icon: CalendarDays,
+      badge: upcoming.length || undefined,
+    },
+    {
+      label: "History & symptoms",
+      href: "/patient?tab=history",
+      icon: ClipboardList,
+    },
+    {
+      label: "Doctor's notes",
+      href: "/patient?tab=notes",
+      icon: FileText,
+      badge: summary?.notes.length || undefined,
+    },
   ];
 
   const openTranscript = async (sessionId: string, title: string) => {
@@ -133,7 +195,12 @@ export default function PatientDashboard({
         data: {
           session_id: sessionId,
           assessment_complete: true,
-          messages: SAMPLE_TRANSCRIPT.map((m, i) => ({ id: i, role: m.role, content: m.content, created_at: null })),
+          messages: SAMPLE_TRANSCRIPT.map((m, i) => ({
+            id: i,
+            role: m.role,
+            content: m.content,
+            created_at: null,
+          })),
           pathway: latest,
         },
       });
@@ -148,11 +215,16 @@ export default function PatientDashboard({
   };
 
   const onScheduled = (appt: Appointment) => {
-    setSummary((s) => (s ? { ...s, appointments: [...s.appointments, appt] } : s));
+    setSummary((s) =>
+      s ? { ...s, appointments: [...s.appointments, appt] } : s,
+    );
     onTabChange("appointments");
   };
 
-  const onAssessmentComplete = (result: PathwayResult, newPatientId?: number) => {
+  const onAssessmentComplete = (
+    result: PathwayResult,
+    newPatientId?: number,
+  ) => {
     // Refresh from the backend when we know who the patient is; otherwise
     // surface the new result locally so the dashboard reflects it right away.
     if (newPatientId != null && !demo) {
@@ -181,7 +253,11 @@ export default function PatientDashboard({
 
   const headerActions = (
     <div className="flex items-center gap-2">
-      <button type="button" onClick={() => setAssistantOpen(true)} className="btn-primary py-2">
+      <button
+        type="button"
+        onClick={() => setAssistantOpen(true)}
+        className="btn-primary py-2"
+      >
         <Sparkles className="h-4 w-4" />
         <span className="hidden sm:inline">Ask the assistant</span>
         <span className="sm:hidden">Assistant</span>
@@ -193,7 +269,11 @@ export default function PatientDashboard({
     <AppShell
       nav={nav}
       activeHref={`/patient?tab=${tab}`}
-      user={{ name: patient?.name ?? "Patient", role: "Patient", initials: initialsOf(patient?.name) }}
+      user={{
+        name: patient?.name ?? "Patient",
+        role: "Patient",
+        initials: initialsOf(patient?.name),
+      }}
       title={TAB_META[tab].title}
       subtitle={TAB_META[tab].subtitle}
       actions={headerActions}
@@ -206,7 +286,10 @@ export default function PatientDashboard({
             <div className="surface h-40 animate-pulse bg-slate-50" />
             <div className="grid gap-4 sm:grid-cols-3">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="surface h-28 animate-pulse bg-slate-50" />
+                <div
+                  key={i}
+                  className="surface h-28 animate-pulse bg-slate-50"
+                />
               ))}
             </div>
           </div>
@@ -221,9 +304,17 @@ export default function PatientDashboard({
             onOpenTranscript={openTranscript}
           />
         ) : tab === "conversations" ? (
-          <ConversationsTab summary={summary} onOpen={openTranscript} onAssistant={() => setAssistantOpen(true)} />
+          <ConversationsTab
+            summary={summary}
+            onOpen={openTranscript}
+            onAssistant={() => setAssistantOpen(true)}
+          />
         ) : tab === "appointments" ? (
-          <AppointmentsTab upcoming={upcoming} past={past} onSchedule={() => setScheduleOpen(true)} />
+          <AppointmentsTab
+            upcoming={upcoming}
+            past={past}
+            onSchedule={() => setScheduleOpen(true)}
+          />
         ) : tab === "history" ? (
           <HistoryTab summary={summary} latest={latest} />
         ) : (
@@ -255,12 +346,18 @@ export default function PatientDashboard({
                 <ChatMessage key={m.id} role={m.role} content={m.content} />
               ))}
             </div>
-            {transcript.data.pathway && <PathwayResultCard result={transcript.data.pathway} compact />}
+            {transcript.data.pathway && (
+              <PathwayResultCard result={transcript.data.pathway} compact />
+            )}
           </div>
         )}
       </Modal>
 
-      <AssistantDrawer open={assistantOpen} onClose={() => setAssistantOpen(false)} onComplete={onAssessmentComplete} />
+      <AssistantDrawer
+        open={assistantOpen}
+        onClose={() => setAssistantOpen(false)}
+        onComplete={onAssessmentComplete}
+      />
     </AppShell>
   );
 }
@@ -300,25 +397,41 @@ function OverviewTab({
             <p className="eyebrow">
               {greeting()}, {firstName}
             </p>
-            <h2 className="mt-2 font-display text-2xl font-semibold sm:text-3xl">How are you feeling today?</h2>
+            <h2 className="mt-2 font-display text-2xl font-semibold sm:text-3xl">
+              How are you feeling today?
+            </h2>
             <p className="mt-2 max-w-lg text-sm leading-6 text-slate-600">
               {latest ? (
                 <>
-                  Your last check-in was {relativeTime(evaluatedAt)} and pointed to{" "}
-                  <span className="font-medium text-slate-800">{latest.disposition.headline.toLowerCase()}</span>. If
-                  anything has changed, talk to the assistant — it takes about three minutes.
+                  Your last check-in was {relativeTime(evaluatedAt)} and pointed
+                  to{" "}
+                  <span className="font-medium text-slate-800">
+                    {latest.disposition.headline.toLowerCase()}
+                  </span>
+                  . If anything has changed, talk to the assistant — it takes
+                  about three minutes.
                 </>
               ) : (
-                <>You haven&apos;t completed an assessment yet. The assistant will ask a few calm questions and give you a clear next step.</>
+                <>
+                  You haven&apos;t completed an assessment yet. The assistant
+                  will ask a few questions and give you a clear next step.
+                </>
               )}
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-            <button type="button" onClick={onAssistant} className="btn-primary justify-center px-6 py-3">
+            <button
+              type="button"
+              onClick={onAssistant}
+              className="btn-primary justify-center px-6 py-3"
+            >
               <MessageSquare className="h-4 w-4" />
               Chat with the assistant
             </button>
-            <Link href="/assessment?mode=voice" className="btn-secondary justify-center px-6 py-3">
+            <Link
+              href="/assessment?mode=voice"
+              className="btn-secondary justify-center px-6 py-3"
+            >
               <Mic className="h-4 w-4 text-brand-600" />
               Talk instead
             </Link>
@@ -335,21 +448,40 @@ function OverviewTab({
               {risk != null && <RiskBadge level={riskLevel(risk)} />}
             </span>
           }
-          hint={evaluatedAt ? `Assessed ${formatDate(evaluatedAt)}` : "No assessment yet"}
+          hint={
+            evaluatedAt
+              ? `Assessed ${formatDate(evaluatedAt)}`
+              : "No assessment yet"
+          }
           icon={<HeartPulse className="h-[18px] w-[18px]" />}
           tone={risk == null ? "neutral" : riskLevel(risk)}
         />
         <StatCard
           label="Conversations logged"
           value={conversations.length}
-          hint={conversations[0]?.started_at ? `Last ${relativeTime(conversations[0].started_at)}` : "Start one any time"}
+          hint={
+            conversations[0]?.started_at
+              ? `Last ${relativeTime(conversations[0].started_at)}`
+              : "Start one any time"
+          }
           icon={<MessageSquare className="h-[18px] w-[18px]" />}
           tone="brand"
         />
         <StatCard
           label="Next appointment"
-          value={upcoming ? formatDate(upcoming.scheduled_for, { month: "short", day: "numeric" }) : "None"}
-          hint={upcoming ? `${formatDateTime(upcoming.scheduled_for).split("·")[1]?.trim()} · ${upcoming.doctor_name ?? "Care team"}` : "Schedule when you're ready"}
+          value={
+            upcoming
+              ? formatDate(upcoming.scheduled_for, {
+                  month: "short",
+                  day: "numeric",
+                })
+              : "None"
+          }
+          hint={
+            upcoming
+              ? `${formatDateTime(upcoming.scheduled_for).split("·")[1]?.trim()} · ${upcoming.doctor_name ?? "Care team"}`
+              : "Schedule when you're ready"
+          }
           icon={<CalendarDays className="h-[18px] w-[18px]" />}
         />
       </section>
@@ -357,17 +489,27 @@ function OverviewTab({
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         <div className="space-y-6">
           {latest ? (
-            <PathwayResultCard result={latest} scheduleHref="/patient?tab=appointments&schedule=1" />
+            <PathwayResultCard
+              result={latest}
+              scheduleHref="/patient?tab=appointments&schedule=1"
+            />
           ) : (
             <section className="surface flex flex-col items-center px-6 py-12 text-center">
               <span className="grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
                 <Sparkles className="h-5 w-5" />
               </span>
-              <h3 className="mt-4 text-base font-semibold">Your first assessment</h3>
+              <h3 className="mt-4 text-base font-semibold">
+                Your first assessment
+              </h3>
               <p className="mt-1 max-w-sm text-sm text-slate-500">
-                Tell the assistant what you&apos;re feeling and it will estimate your risk and recommend a next step.
+                Tell the assistant what you&apos;re feeling and it will estimate
+                your risk and recommend a next step.
               </p>
-              <button type="button" onClick={onAssistant} className="btn-primary mt-5">
+              <button
+                type="button"
+                onClick={onAssistant}
+                className="btn-primary mt-5"
+              >
                 Start now
               </button>
             </section>
@@ -376,11 +518,18 @@ function OverviewTab({
           <section className="surface overflow-hidden">
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
               <h3 className="text-base font-semibold">Recent conversations</h3>
-              <button type="button" onClick={() => onTab("conversations")} className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700">
+              <button
+                type="button"
+                onClick={() => onTab("conversations")}
+                className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
+              >
                 All <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
-            <ConversationList items={conversations.slice(0, 3)} onOpen={onOpenTranscript} />
+            <ConversationList
+              items={conversations.slice(0, 3)}
+              onOpen={onOpenTranscript}
+            />
           </section>
         </div>
 
@@ -394,18 +543,33 @@ function OverviewTab({
               <>
                 <AppointmentRow appointment={upcoming} />
                 <div className="mt-5 flex gap-2">
-                  <button type="button" onClick={onSchedule} className="btn-secondary flex-1 justify-center py-2">
+                  <button
+                    type="button"
+                    onClick={onSchedule}
+                    className="btn-secondary flex-1 justify-center py-2"
+                  >
                     Book another
                   </button>
-                  <button type="button" onClick={() => onTab("appointments")} className="btn-ghost flex-1 justify-center py-2">
+                  <button
+                    type="button"
+                    onClick={() => onTab("appointments")}
+                    className="btn-ghost flex-1 justify-center py-2"
+                  >
                     Details
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <p className="mt-2 text-sm text-slate-500">No upcoming visits. Your assessment can suggest the right timeframe.</p>
-                <button type="button" onClick={onSchedule} className="btn-primary mt-4 w-full justify-center">
+                <p className="mt-2 text-sm text-slate-500">
+                  No upcoming visits. Your assessment can suggest the right
+                  timeframe.
+                </p>
+                <button
+                  type="button"
+                  onClick={onSchedule}
+                  className="btn-primary mt-4 w-full justify-center"
+                >
                   <CalendarPlus className="h-4 w-4" /> Schedule a visit
                 </button>
               </>
@@ -415,16 +579,23 @@ function OverviewTab({
           <section className="surface p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-semibold">From your care team</h3>
-              <button type="button" onClick={() => onTab("notes")} className="text-sm font-medium text-brand-600 hover:text-brand-700">
+              <button
+                type="button"
+                onClick={() => onTab("notes")}
+                className="text-sm font-medium text-brand-600 hover:text-brand-700"
+              >
                 All notes
               </button>
             </div>
             {notes[0] ? (
               <div className="mt-3">
                 <p className="text-xs text-slate-500">
-                  {notes[0].author_name ?? "Clinician"} · {relativeTime(notes[0].created_at)}
+                  {notes[0].author_name ?? "Clinician"} ·{" "}
+                  {relativeTime(notes[0].created_at)}
                 </p>
-                <p className="mt-1.5 line-clamp-4 text-sm leading-6 text-slate-700">{notes[0].content}</p>
+                <p className="mt-1.5 line-clamp-4 text-sm leading-6 text-slate-700">
+                  {notes[0].content}
+                </p>
               </div>
             ) : (
               <p className="mt-2 text-sm text-slate-500">No notes yet.</p>
@@ -436,14 +607,19 @@ function OverviewTab({
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-rose-600 ring-1 ring-rose-100">
                 <Phone className="h-4 w-4" />
               </span>
-              <h3 className="text-base font-semibold text-slate-900">When to call 911</h3>
+              <h3 className="text-base font-semibold text-slate-900">
+                When to call 911
+              </h3>
             </div>
             <ul className="mt-3 space-y-1.5 text-sm text-slate-700">
               <li>· Crushing or squeezing chest pain that won&apos;t ease</li>
               <li>· Pain with shortness of breath, sweating or fainting</li>
               <li>· Pain spreading to your arm, jaw or back</li>
             </ul>
-            <a href="tel:911" className="btn mt-4 w-full bg-rose-600 py-2.5 text-white hover:bg-rose-700">
+            <a
+              href="tel:911"
+              className="btn mt-4 w-full bg-rose-600 py-2.5 text-white hover:bg-rose-700"
+            >
               <Phone className="h-4 w-4" /> Call 911
             </a>
           </section>
@@ -461,7 +637,11 @@ function ConversationList({
   onOpen: (sessionId: string, title: string) => void;
 }) {
   if (items.length === 0) {
-    return <p className="px-6 py-10 text-center text-sm text-slate-500">No conversations yet.</p>;
+    return (
+      <p className="px-6 py-10 text-center text-sm text-slate-500">
+        No conversations yet.
+      </p>
+    );
   }
   return (
     <ul className="divide-y divide-slate-100">
@@ -475,18 +655,32 @@ function ConversationList({
               className="flex w-full items-center gap-4 px-6 py-4 text-left transition hover:bg-slate-50/70"
             >
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-50 text-slate-500 ring-1 ring-slate-200/70">
-                {c.source === "voice" ? <Mic className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
+                {c.source === "voice" ? (
+                  <Mic className="h-4 w-4" />
+                ) : (
+                  <MessageSquare className="h-4 w-4" />
+                )}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-900">{c.preview ?? title}</p>
+                <p className="truncate text-sm font-medium text-slate-900">
+                  {c.preview ?? title}
+                </p>
                 <p className="mt-0.5 text-xs text-slate-500">
                   {formatDateTime(c.started_at)} · {c.message_count} messages
                   {c.primary_pathway ? ` · ${c.primary_pathway}` : ""}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                {c.disposition && <DispositionPill level={c.disposition as DispositionLevel} />}
-                {c.risk_percent != null && <RiskBadge level={riskLevel(c.risk_percent)} percent={c.risk_percent} className="hidden sm:inline-flex" />}
+                {c.disposition && (
+                  <DispositionPill level={c.disposition as DispositionLevel} />
+                )}
+                {c.risk_percent != null && (
+                  <RiskBadge
+                    level={riskLevel(c.risk_percent)}
+                    percent={c.risk_percent}
+                    className="hidden sm:inline-flex"
+                  />
+                )}
               </div>
             </button>
           </li>
@@ -510,9 +704,15 @@ function ConversationsTab({
       <div className="flex flex-col gap-3 border-b border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-base font-semibold">All conversations</h3>
-          <p className="text-xs text-slate-500">Tap any conversation to read the full transcript and its result.</p>
+          <p className="text-xs text-slate-500">
+            Tap any conversation to read the full transcript and its result.
+          </p>
         </div>
-        <button type="button" onClick={onAssistant} className="btn-primary py-2">
+        <button
+          type="button"
+          onClick={onAssistant}
+          className="btn-primary py-2"
+        >
           <Sparkles className="h-4 w-4" /> New conversation
         </button>
       </div>
@@ -537,45 +737,77 @@ function AppointmentRow({ appointment }: { appointment: Appointment }) {
     <div className="mt-4 flex items-start gap-4">
       <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand-600 text-white">
         <span className="text-center leading-tight">
-          <span className="block text-[10px] font-semibold uppercase">{d.toLocaleDateString(undefined, { month: "short" })}</span>
-          <span className="block font-display text-lg font-semibold">{d.getDate()}</span>
+          <span className="block text-[10px] font-semibold uppercase">
+            {d.toLocaleDateString(undefined, { month: "short" })}
+          </span>
+          <span className="block font-display text-lg font-semibold">
+            {d.getDate()}
+          </span>
         </span>
       </div>
       <div className="min-w-0">
         <p className="text-sm font-semibold text-slate-900">
           {formatDateTime(appointment.scheduled_for).split("·")[1]?.trim()} ·{" "}
-          <span className="capitalize">{appointment.appointment_type.replace("_", " ")}</span>
+          <span className="capitalize">
+            {appointment.appointment_type.replace("_", " ")}
+          </span>
         </p>
         <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-600">
           <Stethoscope className="h-3.5 w-3.5 text-slate-400" />
           {appointment.doctor_name ?? "Care team"}
         </p>
-        {appointment.reason && <p className="mt-0.5 text-xs text-slate-500">{appointment.reason}</p>}
-        {appointment.location && <p className="mt-0.5 text-xs text-slate-500">{appointment.location}</p>}
+        {appointment.reason && (
+          <p className="mt-0.5 text-xs text-slate-500">{appointment.reason}</p>
+        )}
+        {appointment.location && (
+          <p className="mt-0.5 text-xs text-slate-500">
+            {appointment.location}
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
-function AppointmentsTab({ upcoming, past, onSchedule }: { upcoming: Appointment[]; past: Appointment[]; onSchedule: () => void }) {
+function AppointmentsTab({
+  upcoming,
+  past,
+  onSchedule,
+}: {
+  upcoming: Appointment[];
+  past: Appointment[];
+  onSchedule: () => void;
+}) {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
       <div className="space-y-6">
         <section className="surface overflow-hidden">
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
             <h3 className="text-base font-semibold">Upcoming</h3>
-            <button type="button" onClick={onSchedule} className="btn-primary py-2">
+            <button
+              type="button"
+              onClick={onSchedule}
+              className="btn-primary py-2"
+            >
               <CalendarPlus className="h-4 w-4" /> Schedule
             </button>
           </div>
           {upcoming.length === 0 ? (
-            <p className="px-6 py-10 text-center text-sm text-slate-500">Nothing scheduled.</p>
+            <p className="px-6 py-10 text-center text-sm text-slate-500">
+              Nothing scheduled.
+            </p>
           ) : (
             <ul className="divide-y divide-slate-100">
               {upcoming.map((a) => (
                 <li key={a.id} className="px-6 pb-5 pt-1">
                   <div className="flex items-center justify-between pt-3">
-                    <p className="text-xs text-slate-500">{formatDate(a.scheduled_for, { weekday: "long", month: "long", day: "numeric" })}</p>
+                    <p className="text-xs text-slate-500">
+                      {formatDate(a.scheduled_for, {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
                     <AppointmentStatusPill status={a.status} />
                   </div>
                   <AppointmentRow appointment={a} />
@@ -590,7 +822,9 @@ function AppointmentsTab({ upcoming, past, onSchedule }: { upcoming: Appointment
             <h3 className="text-base font-semibold">Past visits</h3>
           </div>
           {past.length === 0 ? (
-            <p className="px-6 py-10 text-center text-sm text-slate-500">No past visits on record.</p>
+            <p className="px-6 py-10 text-center text-sm text-slate-500">
+              No past visits on record.
+            </p>
           ) : (
             <ul className="divide-y divide-slate-100">
               {past.map((a) => (
@@ -600,7 +834,10 @@ function AppointmentsTab({ upcoming, past, onSchedule }: { upcoming: Appointment
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-slate-900">
-                      {a.doctor_name ?? "Care team"} · <span className="capitalize">{a.appointment_type.replace("_", " ")}</span>
+                      {a.doctor_name ?? "Care team"} ·{" "}
+                      <span className="capitalize">
+                        {a.appointment_type.replace("_", " ")}
+                      </span>
                     </p>
                     <p className="text-xs text-slate-500">
                       {formatDateTime(a.scheduled_for)}
@@ -618,8 +855,12 @@ function AppointmentsTab({ upcoming, past, onSchedule }: { upcoming: Appointment
       <section className="surface h-fit p-6">
         <h3 className="text-base font-semibold">Before your visit</h3>
         <ul className="mt-3 space-y-2 text-sm text-slate-600">
-          <li>· Bring your medication list and any home blood-pressure readings</li>
-          <li>· Your Agilance conversations are already shared with your clinician</li>
+          <li>
+            · Bring your medication list and any home blood-pressure readings
+          </li>
+          <li>
+            · Your Agilance conversations are already shared with your clinician
+          </li>
           <li>· Arrive 15 minutes early; bring insurance and photo ID</li>
           <li>· If symptoms worsen before the visit, call 911</li>
         </ul>
@@ -628,14 +869,24 @@ function AppointmentsTab({ upcoming, past, onSchedule }: { upcoming: Appointment
   );
 }
 
-function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: PathwayResult | null }) {
+function HistoryTab({
+  summary,
+  latest,
+}: {
+  summary: PatientSummary;
+  latest: PathwayResult | null;
+}) {
   const findings = latest?.findings;
   const symptoms = triState(findings?.symptoms);
   const history = triState(findings?.history);
   const pain = describeChestPain(findings?.chest_pain);
   const cad = latest?.chronic_pathways.find((c) => c.pathway === "cad_risk");
-  const htn = latest?.chronic_pathways.find((c) => c.pathway === "hypertension_management");
-  const dm = latest?.chronic_pathways.find((c) => c.pathway === "diabetes_cardiometabolic");
+  const htn = latest?.chronic_pathways.find(
+    (c) => c.pathway === "hypertension_management",
+  );
+  const dm = latest?.chronic_pathways.find(
+    (c) => c.pathway === "diabetes_cardiometabolic",
+  );
   const p = summary.patient;
   const yes = (v: string | undefined) => (v ?? "").toLowerCase() === "yes";
 
@@ -643,19 +894,30 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
     <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
       <div className="space-y-6">
         <section className="surface p-6">
-          <h3 className="text-base font-semibold">Symptoms from your last conversation</h3>
-          <p className="text-xs text-slate-500">Extracted automatically by the assistant; tell your clinician if anything is wrong.</p>
+          <h3 className="text-base font-semibold">
+            Symptoms from your last conversation
+          </h3>
+          <p className="text-xs text-slate-500">
+            Extracted automatically by the assistant; tell your clinician if
+            anything is wrong.
+          </p>
           {pain.length > 0 && (
             <div className="mt-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Chest pain</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Chest pain
+              </p>
               <p className="mt-1 text-sm text-slate-700">{pain.join(" · ")}</p>
             </div>
           )}
           <div className="mt-4 space-y-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Reported</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Reported
+              </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
-                {symptoms.present.length === 0 && <span className="text-sm text-slate-400">None reported</span>}
+                {symptoms.present.length === 0 && (
+                  <span className="text-sm text-slate-400">None reported</span>
+                )}
                 {symptoms.present.map((k) => (
                   <FlagChip key={k} label={symptomLabel(k)} active />
                 ))}
@@ -663,7 +925,9 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
             </div>
             {symptoms.absent.length > 0 && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Denied</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Denied
+                </p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {symptoms.absent.map((k) => (
                     <FlagChip key={k} label={symptomLabel(k)} active={false} />
@@ -675,7 +939,9 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
         </section>
 
         <section className="surface p-6">
-          <h3 className="text-base font-semibold">Medical history &amp; risk factors</h3>
+          <h3 className="text-base font-semibold">
+            Medical history &amp; risk factors
+          </h3>
           <div className="mt-4 flex flex-wrap gap-1.5">
             {history.present.map((k) => (
               <FlagChip key={k} label={historyLabel(k)} active />
@@ -684,7 +950,10 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
               <>
                 <FlagChip label="Hypertension" active={yes(p.hypertension)} />
                 <FlagChip label="Diabetes" active={yes(p.diabetes)} />
-                <FlagChip label="High cholesterol" active={yes(p.hyperlipidemia)} />
+                <FlagChip
+                  label="High cholesterol"
+                  active={yes(p.hyperlipidemia)}
+                />
                 <FlagChip label="Smoking" active={yes(p.smoking)} />
               </>
             )}
@@ -694,8 +963,12 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
           </div>
           {findings?.medications && findings.medications.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Medications mentioned</p>
-              <p className="mt-1 text-sm capitalize text-slate-700">{findings.medications.join(", ")}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Medications mentioned
+              </p>
+              <p className="mt-1 text-sm capitalize text-slate-700">
+                {findings.medications.join(", ")}
+              </p>
             </div>
           )}
         </section>
@@ -710,15 +983,23 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
               </span>
               <h3 className="text-base font-semibold">Coronary disease risk</h3>
             </div>
-            <p className="mt-4 font-display text-3xl font-semibold tabular-nums">{cad.probability}%</p>
-            <p className="text-xs text-slate-500">pre-test probability · {cad.band?.replace("_", " ")}</p>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{cad.guidance}</p>
+            <p className="mt-4 font-display text-3xl font-semibold tabular-nums">
+              {cad.probability}%
+            </p>
+            <p className="text-xs text-slate-500">
+              pre-test probability · {cad.band?.replace("_", " ")}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              {cad.guidance}
+            </p>
           </section>
         )}
         {htn && htn.status === "active" && (
           <section className="surface p-6">
             <h3 className="text-base font-semibold">Blood pressure plan</h3>
-            <p className="mt-1 text-sm text-slate-600">{htn.summary} Target {htn.target}.</p>
+            <p className="mt-1 text-sm text-slate-600">
+              {htn.summary} Target {htn.target}.
+            </p>
             <ul className="mt-3 space-y-1.5 text-sm text-slate-600">
               {htn.recommendations?.slice(0, 4).map((r) => (
                 <li key={r}>· {r}</li>
@@ -728,7 +1009,9 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
         )}
         {dm && dm.status === "active" && (
           <section className="surface p-6">
-            <h3 className="text-base font-semibold">Diabetes &amp; heart health</h3>
+            <h3 className="text-base font-semibold">
+              Diabetes &amp; heart health
+            </h3>
             <p className="mt-1 text-sm text-slate-600">{dm.summary}</p>
             <ul className="mt-3 space-y-1.5 text-sm text-slate-600">
               {dm.recommendations?.slice(0, 4).map((r) => (
@@ -739,7 +1022,8 @@ function HistoryTab({ summary, latest }: { summary: PatientSummary; latest: Path
         )}
         {!latest && (
           <section className="surface p-6 text-sm text-slate-500">
-            Complete an assessment to see your extracted symptoms, history and risk pathways here.
+            Complete an assessment to see your extracted symptoms, history and
+            risk pathways here.
           </section>
         )}
       </div>
@@ -758,10 +1042,14 @@ function NotesTab({ summary }: { summary: PatientSummary }) {
     <section className="surface overflow-hidden">
       <div className="border-b border-slate-100 px-6 py-4">
         <h3 className="text-base font-semibold">Doctor&apos;s notes</h3>
-        <p className="text-xs text-slate-500">Only notes your clinicians chose to share with you appear here.</p>
+        <p className="text-xs text-slate-500">
+          Only notes your clinicians chose to share with you appear here.
+        </p>
       </div>
       {summary.notes.length === 0 ? (
-        <p className="px-6 py-10 text-center text-sm text-slate-500">No notes yet.</p>
+        <p className="px-6 py-10 text-center text-sm text-slate-500">
+          No notes yet.
+        </p>
       ) : (
         <ul className="divide-y divide-slate-100">
           {summary.notes.map((n) => (
@@ -770,11 +1058,19 @@ function NotesTab({ summary }: { summary: PatientSummary }) {
                 <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-600 text-xs font-semibold text-white">
                   {initialsOf(n.author_name)}
                 </span>
-                <p className="text-sm font-semibold text-slate-900">{n.author_name ?? "Clinician"}</p>
-                <span className="chip bg-slate-50 text-slate-600 ring-slate-200/70">{typeLabel[n.note_type] ?? n.note_type}</span>
-                <span className="ml-auto text-xs text-slate-500">{formatDateTime(n.created_at)}</span>
+                <p className="text-sm font-semibold text-slate-900">
+                  {n.author_name ?? "Clinician"}
+                </p>
+                <span className="chip bg-slate-50 text-slate-600 ring-slate-200/70">
+                  {typeLabel[n.note_type] ?? n.note_type}
+                </span>
+                <span className="ml-auto text-xs text-slate-500">
+                  {formatDateTime(n.created_at)}
+                </span>
               </div>
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">{n.content}</p>
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                {n.content}
+              </p>
             </li>
           ))}
         </ul>
@@ -806,7 +1102,12 @@ function AssistantDrawer({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[60]">
-      <button type="button" aria-label="Close assistant" onClick={onClose} className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px]" />
+      <button
+        type="button"
+        aria-label="Close assistant"
+        onClick={onClose}
+        className="absolute inset-0 bg-slate-900/30 backdrop-blur-[2px]"
+      />
       <aside
         role="dialog"
         aria-modal="true"
@@ -820,14 +1121,24 @@ function AssistantDrawer({
             </span>
             <div>
               <p className="text-sm font-semibold">Agilance assistant</p>
-              <p className="text-xs text-slate-500">Triage, questions, and help organising your care</p>
+              <p className="text-xs text-slate-500">
+                Triage, questions, and help organising your care
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Link href="/assessment?mode=voice" className="btn-ghost py-1.5 text-xs">
+            <Link
+              href="/assessment?mode=voice"
+              className="btn-ghost py-1.5 text-xs"
+            >
               <Mic className="h-3.5 w-3.5" /> Voice
             </Link>
-            <button type="button" onClick={onClose} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full text-slate-500 hover:bg-slate-100">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="grid h-9 w-9 place-items-center rounded-full text-slate-500 hover:bg-slate-100"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>

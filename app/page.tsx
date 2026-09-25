@@ -151,9 +151,9 @@ export default function HomePage() {
                   <span className="text-brand-600">expert-guided</span> care
                 </h1>
                 <p className="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg">
-                  Answer a few calm, clinically-structured questions by text or
-                  voice. In minutes, Agilance gives you a clear risk picture and
-                  the right next step — and lets your care team see who needs
+                  Answer a few clinically-structured questions by text or voice.
+                  In minutes, Agilance gives you a clear risk picture and the
+                  right next step — and lets your care team see who needs
                   attention first.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -435,7 +435,7 @@ export default function HomePage() {
           <div className="container-x">
             <SectionHeading
               eyebrow="How it works"
-              title="Three calm steps, start to finish"
+              title="Three steps, start to finish"
             />
             <ol className="relative mt-14 grid gap-6 md:grid-cols-3">
               <div className="pointer-events-none absolute left-[16.6%] right-[16.6%] top-9 hidden h-px bg-gradient-to-r from-transparent via-brand-200 to-transparent md:block" />
@@ -543,7 +543,7 @@ export default function HomePage() {
                 align="left"
                 eyebrow="For clinicians"
                 title="See who needs you first — at a glance"
-                description="A calm dashboard that turns every patient conversation into a structured, sortable summary: symptoms, history, risk factors and an estimated cardiac risk."
+                description="A dashboard that turns every patient conversation into a structured, sortable summary: symptoms, history, risk factors and an estimated cardiac risk."
               />
               <ul className="mt-8 space-y-3">
                 {[
@@ -714,7 +714,7 @@ export default function HomePage() {
               </h2>
               <p className="mt-4 text-base leading-7 text-brand-100">
                 Take three minutes to talk it through. You&apos;ll leave with a
-                clear picture and a calm plan.
+                clear picture and a concrete plan.
               </p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: "%s · Agilance",
   },
   description:
-    "Agilance helps patients understand chest pain symptoms in minutes and gives clinicians a calm, clear view of who needs care first.",
+    "Agilance helps patients understand chest pain symptoms in minutes and gives clinicians a clear view of who needs care first.",
   icons: { icon: "/favicon.ico" },
 };
 

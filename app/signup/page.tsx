@@ -63,11 +63,14 @@ export default function SignupPage() {
   return (
     <AuthLayout
       title="Create your account"
-      description="Join Agilance to see your patients' assessments in one calm, prioritised view."
+      description="Join Agilance to see your patients' assessments in one prioritised view."
       footer={
         <>
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-brand-600 hover:text-brand-700">
+          <Link
+            href="/login"
+            className="font-semibold text-brand-600 hover:text-brand-700"
+          >
             Sign in
           </Link>
         </>
@@ -144,7 +147,10 @@ export default function SignupPage() {
         </div>
 
         {error && (
-          <p role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700 ring-1 ring-rose-100">
+          <p
+            role="alert"
+            className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700 ring-1 ring-rose-100"
+          >
             {error}
           </p>
         )}

@@ -4,33 +4,32 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Logo from "../brand/Logo";
 
-const COLUMNS: { title: string; links: { label: string; href: string }[] }[] =
-  [
-    {
-      title: "Product",
-      links: [
-        { label: "Start an assessment", href: "/assessment" },
-        { label: "Voice assistant", href: "/assessment?mode=voice" },
-        { label: "How it works", href: "/#how-it-works" },
-        { label: "Features", href: "/#features" },
-      ],
-    },
-    {
-      title: "Clinicians",
-      links: [
-        { label: "Clinician dashboard", href: "/dashboard" },
-        { label: "Sign in", href: "/login" },
-        { label: "Create an account", href: "/signup" },
-      ],
-    },
-    {
-      title: "Patients",
-      links: [
-        { label: "Patient home", href: "/patient" },
-        { label: "When to call 911", href: "/#emergency" },
-      ],
-    },
-  ];
+const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
+  {
+    title: "Product",
+    links: [
+      { label: "Start an assessment", href: "/assessment" },
+      { label: "Voice assistant", href: "/assessment?mode=voice" },
+      { label: "How it works", href: "/#how-it-works" },
+      { label: "Features", href: "/#features" },
+    ],
+  },
+  {
+    title: "Clinicians",
+    links: [
+      { label: "Clinician dashboard", href: "/dashboard" },
+      { label: "Sign in", href: "/login" },
+      { label: "Create an account", href: "/signup" },
+    ],
+  },
+  {
+    title: "Patients",
+    links: [
+      { label: "Patient home", href: "/patient" },
+      { label: "When to call 911", href: "/#emergency" },
+    ],
+  },
+];
 
 export default function SiteFooter() {
   return (
@@ -72,8 +71,8 @@ export default function SiteFooter() {
           <div>
             <Logo tone="light" />
             <p className="mt-4 max-w-xs text-sm leading-6 text-slate-400">
-              Calm, evidence-informed chest pain triage for patients, with a
-              clear queue for the clinicians who care for them.
+              Evidence-informed chest pain triage for patients, with a clear
+              queue for the clinicians who care for them.
             </p>
           </div>
           {COLUMNS.map((col) => (
